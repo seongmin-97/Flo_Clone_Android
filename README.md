@@ -10,3 +10,17 @@ UMC 2021년 2학기 안드로이드 강의 과제
 ### 챌린지 과제
 
 둘러보기 탭도 똑같이 짜보기
+
+
+
+#### 수행 결과
+
+![week1](./git_images/week1_1.png)
+
+![week1](./git_images/week1_2.png)
+
+![week1](./git_images/week1_3.png)
+
+
+
+챌린지 과제는 수행 못함... 나중에 꼭 하자
