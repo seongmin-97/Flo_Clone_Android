@@ -1,5 +1,6 @@
 package com.example.flo_clone
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +18,26 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        binding.homeTitleAlbum1Iv.clipToOutline
+
+        binding.homeTodayMusicAlbum1Cardview.setOnClickListener {
+            (context as MainActivity).supportFragmentManager.beginTransaction()
+                    .replace(R.id.main_frm, AlbumFragment())
+                    .commitAllowingStateLoss()
+        }
+
+        binding.homeTodayMusicAlbum2Cardview.setOnClickListener {
+            (context as MainActivity).supportFragmentManager.beginTransaction()
+                    .replace(R.id.main_frm, AlbumFragment())
+                    .commitAllowingStateLoss()
+        }
+
+        binding.homeTodayMusicAlbum3Cardview.setOnClickListener {
+            (context as MainActivity).supportFragmentManager.beginTransaction()
+                    .replace(R.id.main_frm, AlbumFragment())
+                    .commitAllowingStateLoss()
+        }
+
+
         return binding.root
     }
 }
