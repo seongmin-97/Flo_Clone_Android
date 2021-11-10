@@ -23,8 +23,26 @@
         android:paddingVertical="5dp"
         android:background="#F9F9F9"
         >
-        <LinearLayout
 
+        <SeekBar
+            android:id="@+id/main_progressbar"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/main_miniplayer_layout"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:paddingEnd="0dp"
+            android:paddingStart="0dp"
+            android:background="@null"
+            android:progress="0"
+            android:max="1000"
+            android:progressTint="@color/song_player"
+            android:backgroundTint="@color/song_player_bg"
+            android:thumb="@color/transparent"/>
+
+        <LinearLayout
+            android:id="@+id/main_miniplayer_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -38,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:text="IDOL"
+                android:text="라일락"
 
                 android:textColor="@color/black"
                 android:textSize="13sp" />
@@ -48,7 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:text="방탄소년단"
+                android:text="아이유(IU)"
                 android:textSize="12sp" />
 
         </LinearLayout>

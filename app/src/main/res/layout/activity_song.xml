@@ -161,17 +161,24 @@
 
 
 
-    <ProgressBar
+    <SeekBar
         android:id="@+id/song_progressbar"
         android:layout_width="match_parent"
-        android:layout_height="7dp"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_height="10dp"
         app:layout_constraintBottom_toTopOf="@id/song_button_group_layout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
-        android:layout_marginBottom="30dp"/>
+        android:layout_marginBottom="30dp"
+        android:paddingEnd="0dp"
+        android:paddingStart="0dp"
+        android:background="@null"
+        android:progress="0"
+        android:max="1000"
+        android:progressTint="@color/song_player"
+        android:backgroundTint="@color/song_player_bg"
+        android:thumb="@color/transparent"/>
 
     <TextView
         android:id="@+id/song_progress_time_tv"
