@@ -6,92 +6,100 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.flo_clone.databinding.ActivitySongBinding
 import com.google.gson.Gson
+import kotlinx.coroutines.InternalCoroutinesApi
 
+@InternalCoroutinesApi
 class SongActivity : AppCompatActivity() {
 
     lateinit var binding : ActivitySongBinding
-    var song = Song("라일락", "아이유(IU)", 0,217, false, "")
+    var song = Song("라일락", "아이유(IU)", 0,217, false, "music_lilac", R.drawable.img_album_exp2, false)
     private var mediaPlayer : MediaPlayer? = null
     private var gson : Gson = Gson()
 
     private lateinit var player:Player
     private val handler = Handler(Looper.getMainLooper())
 
+    private var songs = ArrayList<Song>()
+    private var nowPos = 0
+    private lateinit var songDatabase : SongDatabase
+
+    private var isLiked : Boolean = false
+
+    @InternalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySongBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        initPlayList()
+        initSong()
+        allClickListener()
 
-        if (intent.hasExtra("title") && intent.hasExtra("singer") && intent.hasExtra("second") && intent.hasExtra("playTime") && intent.hasExtra("isPlaying") && intent.hasExtra("music")) {
-            song.title = intent.getStringExtra("title")!!
-            song.singer = intent.getStringExtra("singer")!!
-            song.second = intent.getIntExtra("second", 0)
-            song.playTime = intent.getIntExtra("playTime", 0)
-            song.isPlaying = intent.getBooleanExtra("isPlaying", false)
-            song.music = intent.getStringExtra("music")!!
+        isLiked = isLikedSong(song.id)
+    }
 
-            // 리소스 이름으로 리소스 찾기 : resources.getIdentifier
-            val music = resources.getIdentifier(song.music, "raw", this.packageName)
+    override fun onPause() {
+        super.onPause()
 
-            binding.songTitleTv.text = song.title
-            binding.songSingerTv.text = song.singer
-            binding.songEndTimeTv.text = String.format("%02d:%02d", song.playTime/60, song.playTime%60)
+        mediaPlayer?.pause() // 미디어 플레이어 중지
+        player.isPlaying = false // seekbar, timer 스레드 중지
+        songs[nowPos].second = (binding.songProgressbar.progress * songs[nowPos].playTime)/1000
+        songs[nowPos].isPlaying = false
+        setPlayerStatus(false) // 정지상태로 이미지 전환
 
-            mediaPlayer = MediaPlayer.create(this, music)
-        }
+        // sharedPreference 이용
+        val sharedPreferences = getSharedPreferences("song", MODE_PRIVATE) // 데이터를 내부 저장소에 저장
+        // 바로 조작 불가능 -> 에디터 생성
+        val editor = sharedPreferences.edit() // sharedPreference 조작할 때 사용
 
-        player = Player(song.playTime, song.isPlaying)
-        player.start()
+        // Gson 자바 객체와 Json 객체의 중간 다리 역할
+        val json = gson.toJson(song)
+        editor.putString("song", json)
+        editor.apply()
+    }
 
-        binding.songBackButtonIv.setOnClickListener {
-            finish()
-        }
+    override fun onDestroy() {
+        super.onDestroy()
 
-        binding.songPlayButtonIv.setOnClickListener {
-            setPlayerStatus(true)
-            player.isPlaying = true
-            song.isPlaying = true
-            mediaPlayer?.start()
-        }
+        player.interrupt()
+        mediaPlayer?.release() // 미디어 플레이어가 가지고 있던 리소스 해제
+        mediaPlayer = null // 미디어 플레이어 해제
+    }
 
-        binding.songPauseButtonIv.setOnClickListener {
-            setPlayerStatus(false)
-            player.isPlaying = false
-            song.isPlaying = false
-            mediaPlayer?.pause()
-        }
+    @InternalCoroutinesApi
+    private fun likeSong(userId : Int, songId : Int) {
+        val songDB = SongDatabase.getInstance(this)!!
+        val like = Like(userId, songId)
 
-        binding.songRepeatButtonIv.setOnClickListener {
-            setRepeatStatus(0)
-        }
+        songDB.SongDao().likeSong((like))
+    }
 
-        binding.songRepeatButtonOnIv.setOnClickListener {
-            setRepeatStatus(1)
-        }
 
-        binding.songRepeatButtonOn1Iv.setOnClickListener {
-            setRepeatStatus(2)
-        }
+    @InternalCoroutinesApi
+    private fun dislikeSong(userId : Int, songId : Int) {
+        val songDB = SongDatabase.getInstance(this)!!
+        songDB.SongDao().disLikeSong(userId, songId)
+    }
 
-        binding.songRandomButtonIv.setOnClickListener {
-            setRandomStatus(true)
-        }
 
-        binding.songRandomOnButtonIv.setOnClickListener {
-            setRandomStatus(false)
-        }
+    @InternalCoroutinesApi
+    private fun isLikedSong(songId : Int) : Boolean {
+        val songDB = SongDatabase.getInstance(this)!!
+        val userId = getJwt()
 
-        binding.songHeartButtonIv.setOnClickListener {
-            setHeartStatus(true)
-        }
+        val likeId : Int? = songDB.SongDao().isLikeSong(userId, songId)
 
-        binding.songHeartButtonOnIv.setOnClickListener {
-            setHeartStatus(false)
-        }
+        return likeId != null
+    }
+
+    private fun getJwt() : Int {
+        val spf = getSharedPreferences("auth", AppCompatActivity.MODE_PRIVATE)
+
+        return  spf!!.getInt("jwt", 0)
     }
 
     // 플레이버튼이랑 퍼즈버튼 클릭 리스너
@@ -169,31 +177,149 @@ class SongActivity : AppCompatActivity() {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-
-        mediaPlayer?.pause() // 미디어 플레이어 중지
-        player.isPlaying = false // seekbar, timer 스레드 중지
-        song.isPlaying = false
-        song.second = (binding.songProgressbar.progress * song.playTime)/1000
-        setPlayerStatus(false) // 정지상태로 이미지 전환
-
-        // sharedPreference 이용
-        val sharedPreferences = getSharedPreferences("song", MODE_PRIVATE) // 데이터를 내부 저장소에 저장
-        // 바로 조작 불가능 -> 에디터 생성
-        val editor = sharedPreferences.edit() // sharedPreference 조작할 때 사용
-
-        // Gson 자바 객체와 Json 객체의 중간 다리 역할
-        val json = gson.toJson(song)
-        editor.putString("song", json)
-        editor.apply()
+    // 플레이리스트 초기화
+    @InternalCoroutinesApi
+    private fun initPlayList() {
+        songDatabase = SongDatabase.getInstance(this)!!
+        songs.addAll(songDatabase.SongDao().getSongs())
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    // 맨 처음 노래 불러오기
+    private fun initSong() {
+        val spf = getSharedPreferences("song", MODE_PRIVATE)
+        val songId = spf.getInt("songId", 0)
+
+        nowPos = getPlayingSongPosition(songId)
+
+        startTimer()
+        setPlayer(songs[nowPos])
+    }
+
+    // id로 노래 찾기
+    private fun getPlayingSongPosition(songId: Int): Int{
+        for (i in 0 until songs.size){
+            if (songs[i].id == songId){
+                return i
+            }
+        }
+        return 0
+    }
+
+    // 타이머
+    private fun startTimer() {
+        player = Player(songs[nowPos].playTime, songs[nowPos].isPlaying)
+        player.start()
+    }
+
+    private fun setPlayer(song: Song) {
+        val music = resources.getIdentifier(song.music, "raw", this.packageName)
+
+        binding.songTitleTv.text = song.title
+        binding.songSingerTv.text = song.singer
+        binding.songProgressTimeTv.text =
+            String.format("%02d:%02d", song.second / 60, song.second % 60)
+        binding.songEndTimeTv.text =
+            String.format("%02d:%02d", song.playTime / 60, song.playTime % 60)
+        binding.songAlbumIv.setImageResource(song.coverImg!!)
+        binding.songProgressbar.progress = (song.second * 1000 / song.playTime)
+
+        setPlayerStatus(song.isPlaying)
+        setHeartStatus(song.isLike)
+
+        mediaPlayer = MediaPlayer.create(this, music)
+    }
+
+    // 플레이리스트에서 재생 노래 변경 (이동량을 변수로 받아서 그만큼 인덱스 이동)
+    private fun moveSong(direct: Int){
+
+        if (nowPos + direct < 0){
+            Toast.makeText(this,"first song", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (nowPos + direct >= songs.size){
+            Toast.makeText(this,"last song", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        nowPos += direct
 
         player.interrupt()
-        mediaPlayer?.release() // 미디어 플레이어가 가지고 있던 리소스 해제
-        mediaPlayer = null // 미디어 플레이어 해제
+        startTimer()
+
+        mediaPlayer?.release() // 미디어플레이어가 가지고 있던 리소스를 해방
+        mediaPlayer = null // 미디어플레이어 해제
+
+        setPlayer(songs[nowPos])
+    }
+
+    // 좋아요 버튼 누르면 데이터 베이스 갱신 보관함에 뜰 수 있게
+
+    private fun setLike(isLike: Boolean) {
+        val userId : Int = getJwt()
+
+        if (isLike) {
+            setHeartStatus(false)
+            likeSong(userId, song.id)
+        } else {
+            setHeartStatus(true)
+            dislikeSong(userId, song.id)
+        }
+    }
+
+    // 모든 클릭 리스너
+    private fun allClickListener() {
+        binding.songBackButtonIv.setOnClickListener {
+            finish()
+        }
+
+        binding.songPlayButtonIv.setOnClickListener {
+            setPlayerStatus(true)
+            player.isPlaying = true
+            song.isPlaying = true
+            mediaPlayer?.start()
+        }
+
+        binding.songPauseButtonIv.setOnClickListener {
+            setPlayerStatus(false)
+            player.isPlaying = false
+            song.isPlaying = false
+            mediaPlayer?.pause()
+        }
+
+        binding.songRepeatButtonIv.setOnClickListener {
+            setRepeatStatus(0)
+        }
+
+        binding.songRepeatButtonOnIv.setOnClickListener {
+            setRepeatStatus(1)
+        }
+
+        binding.songRepeatButtonOn1Iv.setOnClickListener {
+            setRepeatStatus(2)
+        }
+
+        binding.songRandomButtonIv.setOnClickListener {
+            setRandomStatus(true)
+        }
+
+        binding.songRandomOnButtonIv.setOnClickListener {
+            setRandomStatus(false)
+        }
+
+        binding.songHeartButtonIv.setOnClickListener {
+            setLike(false)
+        }
+
+        binding.songHeartButtonOnIv.setOnClickListener {
+            setLike(true)
+        }
+
+        binding.songPreviousButtonIv.setOnClickListener {
+            moveSong(-1)
+        }
+
+        binding.songNextButtonIv.setOnClickListener {
+            moveSong(1)
+        }
     }
 }

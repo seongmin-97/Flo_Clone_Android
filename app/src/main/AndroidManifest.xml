@@ -18,6 +18,8 @@
         </activity>
         <activity android:name="com.example.flo_clone.MainActivity"/>
         <activity android:name="com.example.flo_clone.SongActivity"/>
+        <activity android:name="com.example.flo_clone.LoginActivity"/>
+        <activity android:name="com.example.flo_clone.SignupActivity"/>
     </application>
 
 </manifest>

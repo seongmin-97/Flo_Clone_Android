@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/signup_id_constraint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/signup_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="회원가입"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:layout_marginTop="30dp"/>
+
+        <EditText
+            android:id="@+id/signup_id_et"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:hint="아이디(이메일)"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/signup_title"
+            android:layout_marginTop="24dp"/>
+
+        <TextView
+            android:id="@+id/signup_mail_symbol_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@"
+            android:textSize="18sp"
+            app:layout_constraintTop_toTopOf="@id/signup_id_et"
+            app:layout_constraintBottom_toBottomOf="@id/signup_id_et"
+            app:layout_constraintStart_toEndOf="@id/signup_id_et"/>
+
+        <EditText
+            android:id="@+id/signup_mail_address_et"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:hint="직접 입력"
+            android:textSize="18sp"
+            app:layout_constraintStart_toEndOf="@id/signup_mail_symbol_tv"
+            app:layout_constraintTop_toTopOf="@id/signup_id_et"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <EditText
+        android:id="@+id/signup_password_et"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@id/signup_id_constraint"
+        app:layout_constraintStart_toStartOf="@id/signup_id_constraint"
+        app:layout_constraintTop_toBottomOf="@id/signup_id_constraint"
+        android:layout_marginTop="20dp"
+        android:inputType="textPassword"
+        android:hint="비밀번호" />
+
+    <EditText
+        android:id="@+id/signup_password_confirm_et"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@id/signup_password_et"
+        app:layout_constraintStart_toStartOf="@id/signup_password_et"
+        app:layout_constraintTop_toBottomOf="@id/signup_password_et"
+        android:layout_marginTop="20dp"
+        android:inputType="textPassword"
+        android:hint="비밀번호 확인" />
+
+    <Button
+        android:id="@+id/signup_btn"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:backgroundTint="@color/black"
+        android:text="가입완료"
+       android:textColor="@color/white"
+        android:textStyle="bold"
+        android:textSize="16sp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
