@@ -60,12 +60,24 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <EditText
+        android:id="@+id/signup_nickname_et"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="닉네임"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="@id/signup_id_constraint"
+        app:layout_constraintEnd_toEndOf="@+id/signup_id_constraint"
+        app:layout_constraintTop_toBottomOf="@id/signup_id_constraint"
+        android:layout_marginTop="20dp"
+        />
+
+    <EditText
         android:id="@+id/signup_password_et"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="@id/signup_id_constraint"
         app:layout_constraintStart_toStartOf="@id/signup_id_constraint"
-        app:layout_constraintTop_toBottomOf="@id/signup_id_constraint"
+        app:layout_constraintTop_toBottomOf="@id/signup_nickname_et"
         android:layout_marginTop="20dp"
         android:inputType="textPassword"
         android:hint="비밀번호" />
@@ -80,6 +92,17 @@
         android:layout_marginTop="20dp"
         android:inputType="textPassword"
         android:hint="비밀번호 확인" />
+
+    <TextView
+        android:id="@+id/signup_email_error_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/purple_500"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintStart_toStartOf="@id/signup_password_confirm_et"
+        app:layout_constraintTop_toBottomOf="@id/signup_password_confirm_et"/>
 
     <Button
         android:id="@+id/signup_btn"
